@@ -88,13 +88,12 @@ canvas{border:2px solid rgba(167,139,250,.3);border-radius:10px;background:#0208
 </head>
 <body>
 <div id="stars"></div>
-
 <div class="screen" id="welcome">
   <div class="logo">🚀</div>
   <h1>Rutas Estelares</h1>
   <div class="inspired">✨ Inspirado en <span>Miss Atomic Bomb</span> ✨</div>
   <div style="font-size:1.7em;margin:6px 0;">👸</div>
-  <p>Conectá la 🚀 con la 🌙 usando un camino que llene <strong>cada celda</strong>.<br>Sin espacios vacíos. Sin cruzar rutas.<br><span style="color:#f9a8d4;font-size:.9em;">¿Podés llegar hasta la Princesa Dai?</span></p>
+  <p>Conectá la 🚀 con la 🌙 llenando <strong>cada celda</strong> y pasando por los números <strong>en orden</strong>.<br><span style="color:#f9a8d4;font-size:.9em;">¿Podés llegar hasta la Princesa Dai?</span></p>
   <button class="btn-main" id="btn-start">🚀 Comenzar</button>
   <button class="btn-sec" id="btn-welcome-hist">📊 Historial</button>
   <div class="credits-bottom">Creado by: <span>Alcides Cardozo</span></div>
@@ -108,7 +107,7 @@ canvas{border:2px solid rgba(167,139,250,.3);border-radius:10px;background:#0208
     <div class="info-pill" id="timer-info">0:00</div>
     <div class="info-pill" id="fill-info">0%</div>
   </div>
-  <div id="status">Llenás TODO el tablero con tu ruta 🚀→🌙</div>
+  <div id="status">Pasá por los números en orden → 🌙</div>
   <canvas id="grid"></canvas>
   <div id="controls">
     <button class="btn" id="btn-undo">↩ Deshacer</button>
@@ -159,7 +158,6 @@ canvas{border:2px solid rgba(167,139,250,.3);border-radius:10px;background:#0208
   <button class="btn-sec" id="btn-final-hist">📊 Historial</button>
   <div style="font-size:.65em;color:#4b5563;margin-top:14px;">Creado by: <span style="color:#7c3aed;">Alcides Cardozo</span></div>
 </div>
-
 <div class="footer-credits">Creado by: <span>Alcides Cardozo</span></div>
 
 <script>
@@ -176,50 +174,39 @@ let AC=null,MN=[];
 function getAC(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();return AC;}
 function stopMusic(){MN.forEach(n=>{try{n.stop();}catch(e){}});MN=[];}
 function playWinMusic(){
-  stopMusic();
-  try{
+  stopMusic();try{
     const ac=getAC();
     [[392,.0,.4],[494,.4,.4],[587,.8,.4],[740,1.2,.6],[659,1.8,.4],[587,2.2,.4],[494,2.6,.4],[440,3.,.6],
      [523,3.6,.5],[587,4.1,.5],[659,4.6,.7],[740,5.3,.5],[698,5.8,.4],[659,6.2,.4],[587,6.6,.8],
      [523,7.4,.5],[494,7.9,.5],[440,8.4,.7],[523,9.1,1.],[587,10.1,.4],[659,10.5,.4],[740,10.9,.4],[880,11.3,1.4]
     ].forEach(([f,s,d])=>{
-      const o=ac.createOscillator(),g=ac.createGain();
-      o.connect(g);g.connect(ac.destination);
+      const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);
       o.type='sine';o.frequency.value=f;
-      g.gain.setValueAtTime(0,ac.currentTime+s);
-      g.gain.linearRampToValueAtTime(.15,ac.currentTime+s+.05);
-      g.gain.linearRampToValueAtTime(0,ac.currentTime+s+d);
-      o.start(ac.currentTime+s);o.stop(ac.currentTime+s+d+.1);
-      MN.push(o);
+      g.gain.setValueAtTime(0,ac.currentTime+s);g.gain.linearRampToValueAtTime(.15,ac.currentTime+s+.05);
+      g.gain.linearRampToValueAtTime(0,ac.currentTime+s+d);o.start(ac.currentTime+s);o.stop(ac.currentTime+s+d+.1);MN.push(o);
     });
     [261,329,392,523].forEach(f=>{
-      const o=ac.createOscillator(),g=ac.createGain();
-      o.connect(g);g.connect(ac.destination);
+      const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);
       o.type='triangle';o.frequency.value=f;
-      g.gain.setValueAtTime(0,ac.currentTime);
-      g.gain.linearRampToValueAtTime(.03,ac.currentTime+.5);
-      g.gain.linearRampToValueAtTime(0,ac.currentTime+12.5);
-      o.start(ac.currentTime);o.stop(ac.currentTime+13);
-      MN.push(o);
+      g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(.03,ac.currentTime+.5);
+      g.gain.linearRampToValueAtTime(0,ac.currentTime+12.5);o.start(ac.currentTime);o.stop(ac.currentTime+13);MN.push(o);
     });
   }catch(e){}
 }
 
 // ── HISTORY ────────────────────────────────────────────
-function lH(){try{return JSON.parse(localStorage.getItem('re_hC')||'{}');}catch(e){return {};}}
-function sH(h){try{localStorage.setItem('re_hC',JSON.stringify(h));}catch(e){}}
+function lH(){try{return JSON.parse(localStorage.getItem('re_hD')||'{}');}catch(e){return {};}}
+function sH(h){try{localStorage.setItem('re_hD',JSON.stringify(h));}catch(e){}}
 function recR(i,ms,mv){const h=lH();if(!h[i])h[i]=[];h[i].push({t:ms,m:mv});sH(h);}
 function fT(ms){const s=Math.floor(ms/1000),m=s/60|0;return m+':'+(s%60<10?'0':'')+(s%60);}
 function renH(){
   const h=lH(),tb=document.getElementById('htbody');tb.innerHTML='';
   document.getElementById('no-hist').classList.toggle('hidden',Object.keys(h).length>0);
-  for(let i=0;i<24;i++){
-    const r=h[i];if(!r||!r.length)continue;
+  for(let i=0;i<24;i++){const r=h[i];if(!r||!r.length)continue;
     const best=Math.min(...r.map(x=>x.t)),last=r[r.length-1];
     const tr=document.createElement('tr');
     tr.innerHTML=`<td>${i+1}</td><td>${fT(last.t)}</td><td>${last.m}</td><td>${fT(best)}</td><td>${r.length}</td>`;
-    tb.appendChild(tr);
-  }
+    tb.appendChild(tr);}
 }
 function shH(){renH();document.getElementById('history-screen').classList.remove('hidden');}
 document.getElementById('btn-close-hist').onclick=()=>document.getElementById('history-screen').classList.add('hidden');
@@ -227,11 +214,15 @@ document.getElementById('btn-clr-hist').onclick=()=>{if(confirm('¿Borrar histor
 ['btn-history','btn-welcome-hist','btn-final-hist'].forEach(id=>document.getElementById(id).onclick=shH);
 
 // ══════════════════════════════════════════════════════
-//  PATH GENERATORS — each returns {r,c}[] visiting ALL N×N
-//  cells exactly once. This GUARANTEES a solution exists.
+//  CORE IDEA:
+//  Build a Hamiltonian path, then pick checkpoint cells
+//  using a "ZIGZAG CORNER" strategy:
+//  Checkpoints alternate between far corners/edges of the
+//  grid so each consecutive pair forces a long detour.
+//  This guarantees difficulty while keeping the solution valid.
 // ══════════════════════════════════════════════════════
 
-// Boustrophedon rows (even rows L→R, odd rows R→L)
+// ── PATH GENERATORS ────────────────────────────────────
 function snakeH(N){
   const p=[];
   for(let r=0;r<N;r++)
@@ -239,8 +230,6 @@ function snakeH(N){
       p.push({r,c});
   return p;
 }
-
-// Boustrophedon columns
 function snakeV(N){
   const p=[];
   for(let c=0;c<N;c++)
@@ -248,12 +237,9 @@ function snakeV(N){
       p.push({r,c});
   return p;
 }
-
-// Clockwise spiral from outside in, starting bottom-left
 function spiralCW(N){
-  const p=[];
-  const g=Array.from({length:N},()=>new Uint8Array(N));
-  const DR=[0,1,0,-1],DC=[1,0,-1,0]; // right,down,left,up
+  const p=[],g=Array.from({length:N},()=>new Uint8Array(N));
+  const DR=[0,1,0,-1],DC=[1,0,-1,0];
   let r=0,c=0,d=0;
   for(let i=0;i<N*N;i++){
     p.push({r,c});g[r][c]=1;
@@ -263,8 +249,6 @@ function spiralCW(N){
   }
   return p;
 }
-
-// Diagonal zigzag
 function diagZig(N){
   const p=[];
   for(let d=0;d<2*N-1;d++){
@@ -276,8 +260,6 @@ function diagZig(N){
   }
   return p;
 }
-
-// U-turn (bottom to top, row by row)
 function uTurn(N){
   const p=[];
   for(let r=N-1;r>=0;r--){
@@ -288,8 +270,6 @@ function uTurn(N){
   }
   return p;
 }
-
-// Vertical comb: down col0, up col1, down col2...
 function combV(N){
   const p=[];
   for(let c=0;c<N;c++){
@@ -298,269 +278,332 @@ function combV(N){
   }
   return p;
 }
-
-// Reverse snake H
-function snakeHR(N){return snakeH(N).slice().reverse();}
-// Reverse snake V
-function snakeVR(N){return snakeV(N).slice().reverse();}
-// Spiral reversed
-function spiralIn(N){return spiralCW(N).slice().reverse();}
-// Diagonal the other way
-function diagZigR(N){return diagZig(N).slice().reverse();}
-// uTurn reversed
-function uTurnR(N){return uTurn(N).slice().reverse();}
-// combV reversed
-function combVR(N){return combV(N).slice().reverse();}
-
-const PATTERNS=[snakeH,snakeV,spiralCW,diagZig,uTurn,combV,
-                snakeHR,snakeVR,spiralIn,diagZigR,uTurnR,combVR];
-
-// ── 24 LEVEL DEFINITIONS ──────────────────────────────
-// [gridSize, patternIndex]
-// Sizes grow: 4,4,4,4 → 5,5,5,5 → 6,6,6,6 → 7,7,7,7 → 8,8,8,8 → 9,9,10,10
-const CFG=[
-  [4,0],[4,2],[4,1],[4,4],
-  [5,5],[5,0],[5,3],[5,2],
-  [6,1],[6,4],[6,0],[6,3],
-  [7,2],[7,5],[7,1],[7,0],
-  [8,3],[8,2],[8,4],[8,1],
-  [9,0],[9,3],[10,1],[10,2],
+const PATTERNS=[
+  snakeH, snakeV, spiralCW, diagZig, uTurn, combV,
+  N=>snakeH(N).reverse(), N=>snakeV(N).reverse(),
+  N=>spiralCW(N).reverse(), N=>diagZig(N).reverse(),
+  N=>uTurn(N).reverse(), N=>combV(N).reverse(),
 ];
 
-// Build levels — guaranteed solution by construction
-const GAME_LEVELS = CFG.map(([N,pi],idx)=>{
-  const fn=PATTERNS[pi%PATTERNS.length];
+// ── CHECKPOINT PLACEMENT STRATEGY ─────────────────────
+// Given a solution path, place `count` checkpoints at positions
+// that MAXIMISE difficulty:
+// - Consecutive checkpoints are placed as far apart as possible
+//   (opposite regions of the grid)
+// - We divide the path into segments and pick from ALTERNATING
+//   ends of each segment (first from back, then from front, etc.)
+// This forces the player to constantly reverse direction.
+function placeCheckpoints(sol, count) {
+  // We have sol[0]=start, sol[last]=end (fixed).
+  // Inner = sol[1..last-1]
+  const inner = sol.slice(1, sol.length - 1);
+  if(inner.length === 0 || count === 0) return [];
+
+  const capped = Math.min(count, inner.length);
+  const checkpoints = [];
+
+  // Split inner path into (capped+1) segments.
+  // From each segment boundary, pick a cell that alternates
+  // between beginning and end of that segment — creating a
+  // zig-zag requirement.
+  const segSize = inner.length / (capped + 1);
+
+  for(let k = 1; k <= capped; k++){
+    const segStart = Math.floor((k-1) * segSize);
+    const segEnd   = Math.floor(k     * segSize) - 1;
+    const mid      = Math.floor((segStart + segEnd) / 2);
+
+    // Alternate: odd checkpoints take from END of segment,
+    // even checkpoints take from START — creates zigzag
+    let idx;
+    if(k % 2 === 1){
+      // Odd: pick near END of segment → forces player to
+      // go far into the segment before doubling back
+      idx = Math.max(segStart, segEnd - Math.floor(segSize * 0.15));
+    } else {
+      // Even: pick near START of segment → forces reversal
+      idx = Math.min(segEnd, segStart + Math.floor(segSize * 0.15));
+    }
+    idx = Math.max(0, Math.min(idx, inner.length - 1));
+
+    const cell = inner[idx];
+    // Avoid duplicates with previous checkpoints
+    const dup = checkpoints.some(cp => cp.r===cell.r && cp.c===cell.c);
+    if(!dup){
+      checkpoints.push({r: cell.r, c: cell.c, num: k});
+    } else {
+      // Fallback: pick from middle of segment
+      const fallback = inner[mid] || inner[idx];
+      if(!checkpoints.some(cp=>cp.r===fallback.r&&cp.c===fallback.c)){
+        checkpoints.push({r:fallback.r,c:fallback.c,num:k});
+      }
+    }
+  }
+  return checkpoints;
+}
+
+// ── 24 LEVEL CONFIGS ──────────────────────────────────
+// [N, patternIdx]
+// Checkpoints: level i (0-based) gets 3 + i*2
+const LEVEL_CFG = [
+  [4,0],[4,6],[5,1],[5,7],
+  [5,2],[6,3],[6,8],[6,4],
+  [7,5],[7,9],[7,0],[7,6],
+  [8,1],[8,7],[8,2],[8,8],
+  [9,3],[9,9],[9,4],[9,10],
+  [10,5],[10,11],[10,0],[10,6],
+];
+
+// Build all 24 levels
+const GAME_LEVELS = LEVEL_CFG.map(([N, pi], idx) => {
+  const fn = PATTERNS[pi % PATTERNS.length];
   let sol;
-  try{ sol=fn(N); }catch(e){ sol=snakeH(N); }
-  // Validate: must have N*N cells, all unique, all adjacent
-  if(!sol||sol.length!==N*N){sol=snakeH(N);}
-  // Extra safety: verify adjacency
+  try { sol = fn(N); } catch(e) { sol = snakeH(N); }
+  if(!sol || sol.length !== N*N) sol = snakeH(N);
+  // Validate adjacency
   for(let i=1;i<sol.length;i++){
     const a=sol[i-1],b=sol[i];
     if(Math.abs(a.r-b.r)+Math.abs(a.c-b.c)!==1){sol=snakeH(N);break;}
   }
-  return{
+
+  const numCp = 3 + idx * 2; // level 1=3, level 2=5, ..., level 24=49
+  const checkpoints = placeCheckpoints(sol, numCp);
+
+  return {
     N,
-    start:{r:sol[0].r, c:sol[0].c},
-    end:{r:sol[sol.length-1].r, c:sol[sol.length-1].c},
-    solution:sol
+    start: {r:sol[0].r, c:sol[0].c},
+    end:   {r:sol[sol.length-1].r, c:sol[sol.length-1].c},
+    checkpoints,
+    solution: sol,
   };
 });
 
 // ── TIMER ──────────────────────────────────────────────
 let timerInt=null,timerEl=0,timerOn=false,timerStart=0;
-function startTimer(){
-  timerStart=Date.now()-timerEl;timerOn=true;
-  timerInt=setInterval(()=>{
-    timerEl=Date.now()-timerStart;
-    document.getElementById('timer-info').textContent=fT(timerEl);
-  },500);
-}
+function startTimer(){timerStart=Date.now()-timerEl;timerOn=true;timerInt=setInterval(()=>{timerEl=Date.now()-timerStart;document.getElementById('timer-info').textContent=fT(timerEl);},500);}
 function stopTimer(){clearInterval(timerInt);timerOn=false;}
 function resetTimer(){stopTimer();timerEl=0;document.getElementById('timer-info').textContent='0:00';}
 
 // ── GAME STATE ─────────────────────────────────────────
-let curLevel=0, userPath=[], moveCount=0;
+let curLevel=0, userPath=[], moveCount=0, nextCp=0;
 const canvas=document.getElementById('grid');
 const ctx=canvas.getContext('2d');
-let N, CW, curLv;
+let N,CW,curLv;
 
 function loadLevel(idx){
-  curLv=GAME_LEVELS[idx];
-  N=curLv.N;
+  curLv=GAME_LEVELS[idx]; N=curLv.N;
   const mw=Math.min(500,window.innerWidth-16);
   const mh=Math.min(500,window.innerHeight-240);
-  CW=Math.min(Math.floor(mw/N),Math.floor(mh/N),58);
-  canvas.width=N*CW;
-  canvas.height=N*CW;
-  userPath=[{r:curLv.start.r, c:curLv.start.c}];
-  moveCount=0;
+  CW=Math.min(Math.floor(mw/N),Math.floor(mh/N),56);
+  canvas.width=N*CW; canvas.height=N*CW;
+  userPath=[{r:curLv.start.r,c:curLv.start.c}];
+  moveCount=0; nextCp=0;
   resetTimer();
   document.getElementById('level-info').textContent='Nivel '+(idx+1)+'/24';
   document.getElementById('moves-info').textContent='Movs: 0';
   document.getElementById('fill-info').textContent='1/'+(N*N);
-  document.getElementById('status').textContent='Conectá 🚀 con 🌙 llenando TODO el tablero';
-  updateDots();
-  draw();
+  document.getElementById('status').textContent=
+    `Buscá el 1️⃣ — pasá ${curLv.checkpoints.length} números en orden → 🌙`;
+  updateDots(); draw();
 }
 
 function updateDots(){
-  const w=document.getElementById('level-dots');
-  w.innerHTML='';
+  const w=document.getElementById('level-dots');w.innerHTML='';
   GAME_LEVELS.forEach((_,i)=>{
     const d=document.createElement('div');
     d.className='dot '+(i<curLevel?'done':i===curLevel?'current':'locked');
-    d.textContent=i+1;
-    w.appendChild(d);
+    d.textContent=i+1; w.appendChild(d);
   });
 }
 
+// ── DRAW ───────────────────────────────────────────────
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#020818';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#020818'; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // Draw empty cells
-  for(let r=0;r<N;r++){
-    for(let c=0;c<N;c++){
-      const x=c*CW,y=r*CW;
-      ctx.strokeStyle='rgba(100,80,180,.15)';
-      ctx.lineWidth=.5;
-      ctx.strokeRect(x+.5,y+.5,CW-1,CW-1);
-    }
+  // Grid lines
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+    ctx.strokeStyle='rgba(100,80,180,.14)'; ctx.lineWidth=.5;
+    ctx.strokeRect(c*CW+.5,r*CW+.5,CW-1,CW-1);
   }
 
-  // Highlight filled cells
+  // Filled cells
   const pathSet=new Set(userPath.map(p=>p.r+'_'+p.c));
   for(const key of pathSet){
     const [r,c]=key.split('_').map(Number);
-    ctx.fillStyle='rgba(109,40,217,.28)';
+    ctx.fillStyle='rgba(109,40,217,.26)';
     ctx.fillRect(c*CW+1,r*CW+1,CW-2,CW-2);
   }
 
-  // Draw path tube
+  // Path tube
   if(userPath.length>1){
     ctx.save();
-    ctx.shadowColor='rgba(139,92,246,.6)';
-    ctx.shadowBlur=7;
-    ctx.strokeStyle='rgba(167,139,250,.92)';
-    ctx.lineWidth=CW*.36;
-    ctx.lineCap='round';
-    ctx.lineJoin='round';
+    ctx.shadowColor='rgba(139,92,246,.55)'; ctx.shadowBlur=6;
+    ctx.strokeStyle='rgba(167,139,250,.9)';
+    ctx.lineWidth=CW*.34; ctx.lineCap='round'; ctx.lineJoin='round';
     ctx.beginPath();
     userPath.forEach((p,i)=>{
-      const px=p.c*CW+CW/2, py=p.r*CW+CW/2;
-      i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+      const px=p.c*CW+CW/2,py=p.r*CW+CW/2;
+      i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
     });
-    ctx.stroke();
-    ctx.restore();
+    ctx.stroke(); ctx.restore();
   }
 
-  // Moon + princess at end cell
+  // Checkpoints
+  curLv.checkpoints.forEach((cp,i)=>{
+    const x=cp.c*CW, y=cp.r*CW;
+    const visited = pathSet.has(cp.r+'_'+cp.c);
+    const isNext  = i === nextCp;
+    const isFuture= i > nextCp;
+
+    // Glow for next checkpoint
+    if(isNext){
+      ctx.save();
+      ctx.shadowColor='rgba(251,191,36,.8)'; ctx.shadowBlur=10;
+      ctx.beginPath(); ctx.arc(x+CW/2,y+CW/2,CW*.44,0,Math.PI*2);
+      ctx.fillStyle='rgba(251,191,36,.22)'; ctx.fill(); ctx.restore();
+    }
+
+    // Circle
+    ctx.beginPath(); ctx.arc(x+CW/2,y+CW/2,CW*.38,0,Math.PI*2);
+    ctx.fillStyle = visited ? 'rgba(52,211,153,.55)'
+                  : isNext  ? 'rgba(251,191,36,.45)'
+                  :            'rgba(80,60,160,.35)';
+    ctx.fill();
+    ctx.strokeStyle = visited ? '#34d399' : isNext ? '#fbbf24' : 'rgba(167,139,250,.4)';
+    ctx.lineWidth = isNext ? 2 : 1.2;
+    ctx.stroke();
+
+    // Number label
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const fs = cp.num >= 10 ? Math.floor(CW*.3) : Math.floor(CW*.38);
+    ctx.font=`bold ${fs}px 'Segoe UI',sans-serif`;
+    ctx.fillStyle = visited ? '#fff' : isNext ? '#fef9c3' : 'rgba(200,180,255,.6)';
+    ctx.fillText(cp.num, x+CW/2, y+CW/2);
+  });
+
+  // Moon + princess
   const {end}=curLv;
   ctx.fillStyle='rgba(251,191,36,.2)';
-  ctx.beginPath();
-  ctx.arc(end.c*CW+CW/2, end.r*CW+CW/2, CW*.46, 0, Math.PI*2);
-  ctx.fill();
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.font=Math.floor(CW*.68)+'px serif';
-  ctx.fillText('🌙', end.c*CW+CW/2, end.r*CW+CW/2);
-  ctx.font=Math.floor(CW*.5)+'px serif';
-  ctx.fillText('👸', end.c*CW+CW/2, end.r*CW+CW/2-CW*.56);
+  ctx.beginPath(); ctx.arc(end.c*CW+CW/2,end.r*CW+CW/2,CW*.46,0,Math.PI*2); ctx.fill();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font=Math.floor(CW*.68)+'px serif'; ctx.fillText('🌙',end.c*CW+CW/2,end.r*CW+CW/2);
+  ctx.font=Math.floor(CW*.5)+'px serif';  ctx.fillText('👸',end.c*CW+CW/2,end.r*CW+CW/2-CW*.56);
 
-  // Rocket at head
+  // Rocket
   const head=userPath[userPath.length-1];
   ctx.font=Math.floor(CW*.84)+'px serif';
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText('🚀', head.c*CW+CW/2, head.r*CW+CW/2);
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('🚀',head.c*CW+CW/2,head.r*CW+CW/2);
 
-  // Update fill counter
   document.getElementById('fill-info').textContent=userPath.length+'/'+(N*N);
 }
 
-function getHead(){return userPath[userPath.length-1];}
-
+// ── MOVE LOGIC ─────────────────────────────────────────
 function tryMove(r,c){
   if(r<0||r>=N||c<0||c>=N)return;
-  const h=getHead();
+  const h=userPath[userPath.length-1];
   if(Math.abs(h.r-r)+Math.abs(h.c-c)!==1)return;
 
-  // If stepping onto an existing cell → trim path back to that cell
+  // Backtrack if stepping on existing cell
   const idx=userPath.findIndex(p=>p.r===r&&p.c===c);
   if(idx>=0){
     userPath=userPath.slice(0,idx+1);
-    moveCount++;
-    document.getElementById('moves-info').textContent='Movs: '+moveCount;
-    draw();
-    return;
+    moveCount++; document.getElementById('moves-info').textContent='Movs: '+moveCount;
+    // Recalculate nextCp
+    const vs=new Set(userPath.map(p=>p.r+'_'+p.c));
+    nextCp=0;
+    for(const cp of curLv.checkpoints){ if(vs.has(cp.r+'_'+cp.c)) nextCp++; else break; }
+    draw(); return;
   }
 
-  // Extend path
   if(!timerOn) startTimer();
-  userPath.push({r,c});
-  moveCount++;
+  userPath.push({r,c}); moveCount++;
   document.getElementById('moves-info').textContent='Movs: '+moveCount;
 
-  const total=N*N;
-  const pct=Math.round(userPath.length/total*100);
-
-  // Check win: reached end AND filled everything
-  if(r===curLv.end.r && c===curLv.end.c){
-    if(userPath.length===total){
-      draw();
-      stopTimer();
-      setTimeout(showWin,300);
-      return;
-    } else {
-      document.getElementById('status').textContent=`🌙 ¡Llegaste! Falta llenar el tablero (${pct}%)`;
-      draw();
-      return;
+  // Check if we hit the next checkpoint
+  if(nextCp < curLv.checkpoints.length){
+    const cp=curLv.checkpoints[nextCp];
+    if(r===cp.r && c===cp.c){
+      nextCp++;
+      const remaining=curLv.checkpoints.length-nextCp;
+      document.getElementById('status').textContent =
+        remaining>0
+          ? `✅ ${cp.num}! Ahora buscá el ${cp.num+1}️⃣`
+          : `✅ ${cp.num}! Llenás todo y llegás a la 🌙`;
+      draw(); return;
     }
   }
 
-  // Status messages
-  if(pct>=90) document.getElementById('status').textContent='🔥 '+pct+'% — ¡Casi!';
-  else if(pct>=60) document.getElementById('status').textContent='💫 '+pct+'% — ¡Bien!';
-  else if(pct>=30) document.getElementById('status').textContent='🚀 '+pct+'% — Seguí...';
-  else document.getElementById('status').textContent='Conectá 🚀 con 🌙 llenando TODO';
+  // Block moon if checkpoints pending
+  if(r===curLv.end.r && c===curLv.end.c){
+    if(nextCp < curLv.checkpoints.length){
+      document.getElementById('status').textContent=
+        `⚠️ Primero pasá por el ${curLv.checkpoints[nextCp].num}!`;
+      userPath.pop(); moveCount--;
+      document.getElementById('moves-info').textContent='Movs: '+moveCount;
+      draw(); return;
+    }
+    if(userPath.length===N*N){
+      draw(); stopTimer(); setTimeout(showWin,300); return;
+    }
+    const pct=Math.round(userPath.length/(N*N)*100);
+    document.getElementById('status').textContent=`🌙 ¡Llegaste! Falta llenar (${pct}%)`;
+    draw(); return;
+  }
+
+  // Normal status
+  const pct=Math.round(userPath.length/(N*N)*100);
+  if(nextCp<curLv.checkpoints.length){
+    document.getElementById('status').textContent=`Buscá el ${curLv.checkpoints[nextCp].num}️⃣ (${pct}% lleno)`;
+  } else if(pct>=90){
+    document.getElementById('status').textContent='🔥 ¡Casi! Llegá a la 🌙';
+  } else {
+    document.getElementById('status').textContent=`Llenás TODO — ${pct}% lleno`;
+  }
   draw();
 }
 
 // ── INPUT ──────────────────────────────────────────────
-function cellFromEvent(e){
-  const rect=canvas.getBoundingClientRect();
-  const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
-  return{
-    r: Math.floor((e.clientY-rect.top)*sy/CW),
-    c: Math.floor((e.clientX-rect.left)*sx/CW)
-  };
+function cellFrom(e){
+  const rect=canvas.getBoundingClientRect(),sx=canvas.width/rect.width,sy=canvas.height/rect.height;
+  return{r:Math.floor((e.clientY-rect.top)*sy/CW),c:Math.floor((e.clientX-rect.left)*sx/CW)};
 }
-
-let mouseDown=false;
-canvas.addEventListener('mousedown',e=>{mouseDown=true;const{r,c}=cellFromEvent(e);tryMove(r,c);});
-canvas.addEventListener('mousemove',e=>{if(!mouseDown)return;const{r,c}=cellFromEvent(e);tryMove(r,c);});
-window.addEventListener('mouseup',()=>mouseDown=false);
-
-canvas.addEventListener('touchstart',e=>{
-  e.preventDefault();
-  const{r,c}=cellFromEvent(e.touches[0]);tryMove(r,c);
-},{passive:false});
-canvas.addEventListener('touchmove',e=>{
-  e.preventDefault();
-  const{r,c}=cellFromEvent(e.touches[0]);tryMove(r,c);
-},{passive:false});
+let md=false;
+canvas.addEventListener('mousedown',e=>{md=true;const{r,c}=cellFrom(e);tryMove(r,c);});
+canvas.addEventListener('mousemove',e=>{if(!md)return;const{r,c}=cellFrom(e);tryMove(r,c);});
+window.addEventListener('mouseup',()=>md=false);
+canvas.addEventListener('touchstart',e=>{e.preventDefault();const{r,c}=cellFrom(e.touches[0]);tryMove(r,c);},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();const{r,c}=cellFrom(e.touches[0]);tryMove(r,c);},{passive:false});
 canvas.addEventListener('touchend',e=>e.preventDefault(),{passive:false});
-
 document.addEventListener('keydown',e=>{
   if(document.getElementById('game').style.display==='none')return;
-  const h=getHead();
-  if(e.key==='ArrowUp')    {e.preventDefault();tryMove(h.r-1,h.c);}
-  else if(e.key==='ArrowDown') {e.preventDefault();tryMove(h.r+1,h.c);}
-  else if(e.key==='ArrowLeft') {e.preventDefault();tryMove(h.r,h.c-1);}
+  const h=userPath[userPath.length-1];
+  if(e.key==='ArrowUp'){e.preventDefault();tryMove(h.r-1,h.c);}
+  else if(e.key==='ArrowDown'){e.preventDefault();tryMove(h.r+1,h.c);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();tryMove(h.r,h.c-1);}
   else if(e.key==='ArrowRight'){e.preventDefault();tryMove(h.r,h.c+1);}
   else if(e.key==='z'||e.key==='Z') undoStep();
 });
 
 function undoStep(){
   if(userPath.length>1){
-    userPath.pop();
-    moveCount++;
+    userPath.pop(); moveCount++;
     document.getElementById('moves-info').textContent='Movs: '+moveCount;
+    const vs=new Set(userPath.map(p=>p.r+'_'+p.c));
+    nextCp=0;
+    for(const cp of curLv.checkpoints){if(vs.has(cp.r+'_'+cp.c))nextCp++;else break;}
     draw();
   }
 }
 
-// ── BUTTONS ────────────────────────────────────────────
 document.getElementById('btn-undo').onclick=undoStep;
-
 document.getElementById('btn-reset').onclick=()=>{
   userPath=[{r:curLv.start.r,c:curLv.start.c}];
+  nextCp=0;
   document.getElementById('status').textContent='↺ Ruta limpiada — el tiempo sigue...';
   draw();
 };
-
 document.getElementById('btn-menu').onclick=()=>{
   stopMusic();resetTimer();
   ['win-overlay','final-screen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
@@ -568,24 +611,18 @@ document.getElementById('btn-menu').onclick=()=>{
   document.getElementById('welcome').classList.remove('hidden');
 };
 
-// ── WIN ────────────────────────────────────────────────
 function showWin(){
   recR(curLevel,timerEl,moveCount);
-  const h=lH();
-  const runs=h[curLevel]||[];
-  const best=Math.min(...runs.map(r=>r.t));
+  const h=lH();const runs=h[curLevel]||[];const best=Math.min(...runs.map(r=>r.t));
   document.getElementById('ws-time').textContent=fT(timerEl);
   document.getElementById('ws-moves').textContent=moveCount;
   document.getElementById('ws-best').textContent=fT(best)+(runs.length>1&&timerEl===best?' 🆕':'');
   const hd=document.getElementById('hearts');hd.innerHTML='';
   const em=['💜','⭐','✨','💫','🌟','❤️','🌙'];
   for(let i=0;i<16;i++){
-    const h2=document.createElement('div');h2.className='heart';
-    h2.textContent=em[i%em.length];
-    h2.style.left=Math.random()*85+'%';
-    h2.style.bottom='0';
-    h2.style.animationDelay=Math.random()*3+'s';
-    h2.style.animationDuration=(2+Math.random()*2)+'s';
+    const h2=document.createElement('div');h2.className='heart';h2.textContent=em[i%em.length];
+    h2.style.left=Math.random()*85+'%';h2.style.bottom='0';
+    h2.style.animationDelay=Math.random()*3+'s';h2.style.animationDuration=(2+Math.random()*2)+'s';
     hd.appendChild(h2);
   }
   document.getElementById('btn-next').textContent=curLevel===23?'💜 Ver el final...':'Siguiente Nivel →';
@@ -594,17 +631,13 @@ function showWin(){
 }
 
 document.getElementById('btn-next').onclick=()=>{
-  stopMusic();
-  document.getElementById('win-overlay').classList.add('hidden');
+  stopMusic();document.getElementById('win-overlay').classList.add('hidden');
   if(curLevel===23){
     document.getElementById('game').style.display='none';
     document.getElementById('final-screen').classList.remove('hidden');
-    launchFinalHearts();
-    return;
+    launchFinalHearts();return;
   }
-  curLevel++;
-  resetTimer();
-  loadLevel(curLevel);
+  curLevel++;resetTimer();loadLevel(curLevel);
 };
 
 function launchFinalHearts(){
@@ -619,13 +652,10 @@ function launchFinalHearts(){
 }
 
 document.getElementById('btn-play-again').onclick=()=>{
-  stopMusic();
-  document.getElementById('final-screen').classList.add('hidden');
+  stopMusic();document.getElementById('final-screen').classList.add('hidden');
   curLevel=0;resetTimer();
-  document.getElementById('game').style.display='flex';
-  loadLevel(0);
+  document.getElementById('game').style.display='flex';loadLevel(0);
 };
-
 document.getElementById('btn-start').onclick=()=>{
   document.getElementById('welcome').classList.add('hidden');
   document.getElementById('game').style.display='flex';
